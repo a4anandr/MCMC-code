@@ -62,13 +62,13 @@ sgamma = sqrt(gamma); % Std deviation parameter
     
 %% Flags to be set to choose which approximation methods to compare
 exact = 1;       % Computes the exact h' and plots 
-fin   = 0;       % Computes h' using finite dimensional basis
-coif  = 0;       % Computes h' using Coifman kernel method
+fin   = 1;       % Computes h' using finite dimensional basis
+coif  = 1;       % Computes h' using Coifman kernel method
 rkhs  = 1;       % Computes h' using RKHS
 zero_mean = 1;   % Computes h' using RKHS with Lagrange multipliers
-const = 0;       % Computes the constant gain approximation
+const = 1;       % Computes the constant gain approximation
 % Flag for variance minimization - ZV-MCMC based on Mira et al. 
-var_min = 0; 
+var_min = 1; 
 
 % i) Finite dimensional basis
 if fin == 1
@@ -245,19 +245,19 @@ for run = 1: 1 : No_runs
     if zero_mean == 1
         if iid == 1
            [~, K_zm_i]   = gain_rkhs_zm_mcmc(X_iid', c, 1, kernel, lambda, eps_zm, N_zm, diag_fn );    
-           [cv_X_iid]    = compute_cv(X_iid, K_zm_i, grad_U_x);
+           [cv_X_iid]    = compute_cv(X_iid, K_zm_i', grad_U_x);
            c_zm_iid      = c(X_iid) + cv_X_iid;
            c_hat_zm_iid(run) = mean(c_zm_iid);
         end
         if langevin == 1
            [~, K_zm_l]   = gain_rkhs_zm_mcmc(X_lang' , c, 1, kernel,lambda, eps_zm, N_zm, diag_fn);
-           [cv_X_lang]   = compute_cv(X_lang, K_zm_l, grad_U_x);
+           [cv_X_lang]   = compute_cv(X_lang, K_zm_l', grad_U_x);
            c_zm_lang     = c(X_lang) + cv_X_lang;
            c_hat_zm_lang(run) = mean(c_zm_lang);
         end
         if metropolis == 1
            [~, K_zm_m]   = gain_rkhs_zm_mcmc(X_mh' , c, 1, kernel,lambda, eps_zm, N_zm, diag_fn);
-           [cv_X_mh]     = compute_cv(X_mh, K_zm_m, grad_U_x);
+           [cv_X_mh]     = compute_cv(X_mh, K_zm_m', grad_U_x);
            c_zm_mh       = c(X_mh) + cv_X_mh;
            c_hat_zm_mh(run) = mean(c_zm_mh);
         end    
@@ -390,7 +390,7 @@ for run = 1: 1 : No_runs
                 hold on;
             end
             if zero_mean == 1
-                plot(X_lang, K_zm_m, 'cs','DisplayName','RKHS(ZM)');
+                plot(X_mh, K_zm_m, 'cs','DisplayName','RKHS(ZM)');
                 hold on;
             end
             if const ==1
