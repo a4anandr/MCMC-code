@@ -19,7 +19,6 @@ syms x;
 diag_main = 1;   % Diagnostics flag for main function, displays figures in main.
 diag_output = 1;
 diag_fn = 0;     % Diagnostics flag, if 1, then all the functions display plots for diagnostics, Set it to 0 to avoid plots from within the calling functions
-% rng(1);        % Set a common seed
 No_runs = 1;    % Total number of runs to compute the rmse metric for each of the filters for comparison
 
 %% Parameters of the target density - 2 component Gaussian mixture density 
@@ -56,14 +55,14 @@ metropolis = 1;
 % mala     = 1;
 
 % Sampling parameters
-N  = 5000;            % No of samples obtained
+N  = 10000;            % No of samples obtained
 gamma = 0.1;          % Time steps / variance parameter for Langevin and MH algorithms
 sgamma = sqrt(gamma); % Std deviation parameter
     
 %% Flags to be set to choose which approximation methods to compare
 exact = 1;       % Computes the exact h' and plots 
-fin   = 1;       % Computes h' using finite dimensional basis
-coif  = 1;       % Computes h' using Coifman kernel method
+fin   = 0;       % Computes h' using finite dimensional basis
+coif  = 0;       % Computes h' using Coifman kernel method
 rkhs  = 1;       % Computes h' using RKHS
 zero_mean = 1;   % Computes h' using RKHS with Lagrange multipliers
 const = 1;       % Computes the constant gain approximation
@@ -539,7 +538,7 @@ end
 
 % Histogram of asymptotic variance 
 style = 'bar';         % or stairs
-bw    = 0.1;           % bin width
+bw    = 1;           % bin width
 figure;
 if iid == 1
    histogram(sqrt(N) * (c_hat_iid - eta),'Normalization','pdf','DisplayStyle',style,'BinWidth',bw,'DisplayName','Standard MC');
@@ -633,11 +632,11 @@ if metropolis == 1
       hold on;
    end
    if rkhs == 1
-      histogram(sqrt(N) * (c_hat_rkhs_lang - eta),'Normalization','pdf','DisplayStyle',style,'BinWidth',bw,'DisplayName','RKHS');
+      histogram(sqrt(N) * (c_hat_rkhs_mh - eta),'Normalization','pdf','DisplayStyle',style,'BinWidth',bw,'DisplayName','RKHS');
       hold on;
    end
    if zero_mean == 1
-      histogram(sqrt(N) * (c_hat_zm_lang - eta),'Normalization','pdf','DisplayStyle',style,'BinWidth',bw,'DisplayName','RKHS(ZM)');
+      histogram(sqrt(N) * (c_hat_zm_mh - eta),'Normalization','pdf','DisplayStyle',style,'BinWidth',bw,'DisplayName','RKHS(ZM)');
       hold on;
    end
    if const == 1
