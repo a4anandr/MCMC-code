@@ -139,7 +139,7 @@ for run = 1: 1 : No_runs
     if metropolis == 1
         X_mh(1) = common_rand(1);
         for n = 2:1:N
-            X_mh_next = X_mh(n-1) + sgamma * common_rand(n);                   % Random Walk Metropolis chain
+            X_mh_next = X_mh(n-1) + sqrt(2) * sgamma * common_rand(n);                   % Random Walk Metropolis chain
         % Acceptance ratio  
             alpha = p_x(X_mh_next)/p_x(X_mh(n-1));
             if(rand < alpha)
