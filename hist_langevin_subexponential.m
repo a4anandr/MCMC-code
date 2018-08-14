@@ -19,12 +19,12 @@ X = xmin : step : xmax;
 
 % Time domain specifications
 N     = 100000;
-dt    = 0.1;
-sdt   = sqrt(dt);
-sqrt2 = sqrt(2);
+gamma    = 0.1;
+sgamma   = sqrt(gamma);
+sqrt2    = sqrt(2);
 
 % For histogram
-No_trials   = 100;
+No_trials   = 1000;
 
 % Subexponential density
 delta     = 1;    % 0 < delta < 1, delta = 1 => Gaussian 
@@ -45,7 +45,7 @@ U        = -log(p);
 grad_U   = diff(U);
 grad_U_x = matlabFunction(grad_U);
 
-% Observation function
+% Function whose mean is to be computed
 c = x;    % c = sin(x);
 c_x = matlabFunction(c);
 
@@ -78,7 +78,7 @@ for d = 1 : 1 : length(l)
         run
         rng(run + No_trials)
         for n= 1 : 1 : N
-            X_lang(n+1) = X_lang(n) - grad_U_x(X_lang(n))*dt +  sqrt2 * sdt * randn;
+            X_lang(n+1) = X_lang(n) - grad_U_x(X_lang(n))*gamma +  sqrt2 * sgamma * randn;
             % c_hat_lang_cv(n+1) = (n/(n+1)) * c_hat_lang_cv(n) + (1/(n+1)) * c_theta_x(X_lang(n+1));  
             % c_hat_lang(n+1)    = (n/(n+1)) * c_hat_lang(n)  + (1/(n+1)) * c_x(X_lang(n+1));  
         end

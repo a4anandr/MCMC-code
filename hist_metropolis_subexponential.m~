@@ -19,12 +19,12 @@ step = 0.01;
 X=xmin:step:xmax;
 
 % Time domain specifications
-N = 10000;           % Total number of samples obtained from RWM
+N = 100000;           % Total number of samples obtained from RWM
 gamma = 0.1;          % Step size parameter used in RWM
 burnin = 2;           % Number of samples burned in 
 
 % For histogram
-No_trials =100;     % Total number of independent trials
+No_trials =1000;     % Total number of independent trials
 
 % Subexponential density
 delta = 1;    % 0 < delta < 1, delta = 1 => Gaussian 
@@ -90,25 +90,26 @@ for d = 1 : 1 : length(l)
                 end
             % c_hat_mh_cv(n+1) = (n/(n+1)) * c_hat_mh_cv(n) + (1/(n+1)) * c_theta_x(X_mh(n+1));  
             % c_hat_mh(n+1)    = (n/(n+1)) * c_hat_mh(n)  + (1/(n+1)) * c_x(X_mh(n+1));  
-           end
+             end
    % Monte Carlo estimate for M and b
-          [K_theta_2] = gain_fin(X_mh(burnin+1 : end),c_x,l(d),basis,mu,sig,1,2,diag_fn); 
-          [cv_X_mh]   = compute_cv(X_mh(burnin+1 : end), K_theta_2, grad_U_x);
+       [K_theta_2] = gain_fin(X_mh(burnin+1 : end),c_x,l(d),basis,mu,sig,1,2,diag_fn); 
+       [cv_X_mh]   = compute_cv(X_mh(burnin+1 : end), K_theta_2, grad_U_x);
 
-          c_hat_mh(run)        = mean(c_x(X_mh(burnin+1 : end)));
-          c_hat_mh_cv(run)     = mean(c_theta_x(X_mh(burnin+1 : end)));  
-          c_hat_mh_cv_2(run)   = mean(c_x(X_mh(burnin+1 : end)) + cv_X_mh);
-        end
+       c_hat_mh(run)        = mean(c_x(X_mh(burnin+1 : end)));
+       c_hat_mh_cv(run)     = mean(c_theta_x(X_mh(burnin+1 : end)));  
+       c_hat_mh_cv_2(run)   = mean(c_x(X_mh(burnin+1 : end)) + cv_X_mh);
     end
+end
 
 %% Histogram and asymptotic variance computation
-    eta_hat      = mean(c_hat_mh)
-    eta_hat_lang = mean(c_hat_mh_cv)
-    eta_hat_lang2= mean(c_hat_mh_cv_2)
+eta_hat      = mean(c_hat_mh)
+eta_hat_lang = mean(c_hat_mh_cv)
+eta_hat_lang2= mean(c_hat_mh_cv_2)
 
-    hist_variance(d,:)     = sqrt((N - burnin))*(c_hat_mh_cv - eta);
-    hist_variance_0(d,:)   = sqrt((N - burnin))*(c_hat_mh - eta);
-    hist_variance_2(d,:)   = sqrt((N - burnin))*(c_hat_mh_cv_2 - eta);
+hist_variance(d,:)     = sqrt((N - burnin))*(c_hat_mh_cv - eta);
+hist_variance_0(d,:)   = sqrt((N - burnin))*(c_hat_mh - eta);
+hist_variance_2(d,:)   = sqrt((N - burnin))*(c_hat_mh_cv_2 - eta);
+
 
 %% Figures
 % Histogram of the RWM
@@ -150,7 +151,7 @@ if diag_main == 1 && No_trials > 1
           h.FaceColor = 'r';
           hold on;
           hist(hist_variance(d,:),bins);
-          legend('Standard MC',['l=' num2str(l(d))]);
+          legend('Standard MC',['l=' num2str(d)]);
           title('Langevin');
        else 
           figure;
@@ -162,8 +163,7 @@ if diag_main == 1 && No_trials > 1
           figure;
           histogram(hist_variance_0(d,:),'Normalization','pdf','DisplayStyle','bar','BinWidth',1,'DisplayName','Standard MC');
           hold on;
-          histogram(hist_variance(d,:),'Normalization','pdf','DisplayStyle','bar','BinWidth',1,'DisplayName',['l = ' num2str(l(d)) ' Integration']);
-          histogram(hist_variance_2(d,:),'Normalization','pdf','DisplayStyle','bar','BinWidth',1,'DisplayName',['l = ' num2str(l(d)) ' Empirical']);
+          histogram(hist_variance(d,:),'Normalization','pdf','DisplayStyle','bar','BinWidth',1,'DisplayName',['l = ' num2str(d)]);
           title(['Histogram of \eta^{i} - \eta for ' num2str(No_trials) 'independent trials']);
           legend('show');   
        end

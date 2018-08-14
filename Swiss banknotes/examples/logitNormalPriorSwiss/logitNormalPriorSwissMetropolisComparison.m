@@ -31,8 +31,8 @@ for trial = 1 : 1 : No_trials
 
     options.initialParameters = zeros(1, model.np);
 
-    options.nMcmc = 10000;
-    options.nBurnIn = 1000;
+    options.nMcmc = 100000;
+    options.nBurnIn = 10000;
     options.proposalWidthCorrection = 0.1;
     options.monitorRate = 100;
 
