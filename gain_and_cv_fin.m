@@ -1,4 +1,4 @@
-function [K] = gain_fin(Xi,c,d,basis,mu,sigma,p,a,diag)
+function [K c_theta] = gain_and_cv_fin(Xi,c,d,basis,density,mu,sigma,p,a,diag)
 % Returns the gain computed at particle locations Xi using a finite
 % dimensional basis
   tic;
@@ -8,7 +8,10 @@ function [K] = gain_fin(Xi,c,d,basis,mu,sigma,p,a,diag)
   b = zeros(d,1);
   m = length(mu);
   d0 = d/2;    
- 
+  
+  density_x = matlabFunction(density);
+  grad_U    = - diff(log(density));
+  
   for i = 1:m
       p_basis(i) = exp(-norm(x-mu(i))^2/(2   * a * sigma(i)^2));    % factor a 
   end
@@ -53,20 +56,19 @@ H   = c(Xi);
 eta = mean(c(Xi));
 
 for i = 1:1:N
-    grad_psi_inner = (grad_psi_x(Xi(i))'* grad_psi_x(Xi(i)));
+    grad_psi_inner = (grad_psi_x(Xi(i))'* grad_psi_x(Xi(i))) * density_x(Xi(i));
     M = M + (1/N) * grad_psi_inner ;
-    b = b + (1/N) * (H(i) - eta) * psi_x(Xi(i))';
+    b = b + (1/N) * (H(i) - eta) * psi_x(Xi(i))' * density_x(Xi(i));
 end
-
 theta = (M\b);
 
-for i = 1:N
-    K(i) = theta' * grad_psi_x(Xi(i))';
+K = 0;
+for i = 1: d
+    K   = K + theta(i) * grad_psi(i);
 end
 
-if diag == 1
-    figure;
-    plot(Xi,K,'b*');
-    hold on;
-end
+K_dot   = diff(K);
+cv      = - grad_U * K + K_dot;           % This should be close to -c(x)
+c_theta = c + cv;                         % If cv = -\tilc, then c_theta = \eta
+
 end
