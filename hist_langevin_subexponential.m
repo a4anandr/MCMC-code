@@ -18,13 +18,13 @@ step = 0.01;
 X = xmin : step : xmax;
 
 % Time domain specifications
-N     = 10000;
+N     = 100000;
 dt    = 0.1;
 sdt   = sqrt(dt);
 sqrt2 = sqrt(2);
 
 % For histogram
-No_trials   = 1;
+No_trials   = 100;
 
 % Subexponential density
 delta     = 1;    % 0 < delta < 1, delta = 1 => Gaussian 
