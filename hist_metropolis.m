@@ -1,4 +1,4 @@
-%% %% Main function to plot the reduction in asymptotic variance with increase in basis dimension for RWM
+%% Main function to plot the reduction in asymptotic variance with increase in basis dimension for RWM
 % Also plots histograms of mean estimates
 
 clc;
