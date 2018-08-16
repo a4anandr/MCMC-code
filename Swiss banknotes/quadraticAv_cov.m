@@ -1,14 +1,12 @@
 function [thetaZv, a] = quadraticAv_cov(theta, z)
-% quadraticAZv: calculation of ZV-RMHMC estimates using a quadratic
-% polynomial.
-
+% quadraticAv_cov: calculation of diff TD control variates using covariance
+% function to make it computationally faster
 % Written by Anand Radhakrishnan
 % (c) UF, Department of ECE., All rights reserved.
+% 2z = grad_U (- grad log posterior) 
 tic;
 [n, d] = size(theta);
-theta_mean = mean(theta); 
 
-Mold = zeros(d*(d+3)/2,d*(d+3)/2);
 zSquare = zeros(n, d*(d+3)/2);
 k = 2*d+1;
 
@@ -25,22 +23,9 @@ end
 
 [b, a]   = deal(zeros(d*(d+3)/2, d));
 
-% for m = 1:1:n    
-%    grad_psi(:,:,m) = [eye(d); diag(theta(m,:)); theta(m,2) theta(m,1) 0 0; theta(m,3) 0 theta(m,1) 0; theta(m,4) 0 0 theta(m,1);0 theta(m,3) theta(m,2) 0; 0 theta(m,4) 0 theta(m,2); 0 0 theta(m,4) theta(m,3)];   % 14 * 4
-%    % Dpsi(m,:) = - 2 * z(m,:) * [eye(d) diag(theta(m,:)) [ theta(m,2) theta(m,3)  theta(m,4) 0 0 0; theta(m,1) 0 0 theta(m,3) theta(m,4) 0;  0 theta(m,1) 0 theta(m,2) 0 theta(m,4); 0 0 theta(m,1) 0  theta(m,2) theta(m,3)]] + [ 0 0 0 0 1 1 1 1 0 0 0 0 0 0]; 
-%    Mold = Mold + (1/(n-1)) * grad_psi(:,:,m) * grad_psi(:,:,m)';
-% end
-% 
-% cond(Mold)
-% for i = 1:d
-%    bold(:, i)  = (1/n)* psi' *(theta(:,i) - theta_mean(i));   
-% end
-% aold = Mold \ bold;
-
-
 covAll   = cov([2*zSquare psi theta]);
-M      = covAll(1:d*(d+3)/2, d*(d+3)/2 + 1 : d*(d+3)); 
-cond(M)
+M        = covAll(1:d*(d+3)/2, d*(d+3)/2 + 1 : d*(d+3)); 
+
 b      = covAll(d*(d+3)/2 + 1 : d*(d+3),d*(d+3)+1: d*(d+4));
 a = M\b;
 
