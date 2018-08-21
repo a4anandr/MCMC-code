@@ -1,2 +1,5 @@
 /Figures
 *.m~
+*.asv
+*.fig
+desktop.ini
