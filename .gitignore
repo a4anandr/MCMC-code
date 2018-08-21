@@ -2,4 +2,5 @@
 *.m~
 *.asv
 *.fig
+*.mat
 desktop.ini
