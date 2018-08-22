@@ -12,16 +12,24 @@ end
 Xi_train  = Xi(ind_train);
 
 % Evaluation of kernel matrices 
-if kernel == 0  % Gaussian
-    for i = 1:N
-       for k = 1:N_ker          
-           if (Xi(i) ~= Xi_train(k)) || (i == ind_train(k))
-               Ker(i,k)   =  exp(-(norm(Xi(i) - Xi_train(k)).^2/(4 * epsilon)));  
-               Ker_x(i,k) =  - (Xi(i) - Xi_train(k)) / (2 * epsilon) .* Ker(i,k);
-           end
-       end
-    end 
-end  
+v = version('-release');
+if kernel == 0
+    if v == '2018a'
+        for k = 1:N_ker          % Need to fix this for RWM where Xi_train could have repetitions of the same sample 
+            Ker(:,k)   = exp(- vecnorm((Xi' - Xi_train(k) * ones(N,1)),2,2).^2 / (4 * epsilon));
+            Ker_x(:,k) = - (Xi' - Xi_train(k) * ones(N,1))./ (2 * epsilon) .* Ker(:,k);
+        end
+    else   % older Matlab versions that do not have vecnorm
+        for i = 1:N
+            for k = 1:N_ker          
+                if (Xi(i) ~= Xi_train(k)) || (i == ind_train(k))
+                   Ker1(i,k)   =  exp(-(norm(Xi(i) - Xi_train(k)).^2/(4 * epsilon)));  
+                   Ker1_x(i,k) =  - (Xi(i) - Xi_train(k)) / (2 * epsilon) .* Ker1(i,k);
+                end
+            end
+        end 
+    end
+end
    
  H     = c(Xi);       
  eta   = mean(c(Xi));
@@ -31,15 +39,12 @@ end
  M_m     = lambda * Ker(ind_train,:)' + (1 / N) * Ker_x' * Ker_x;       % Ker_x * Ker_x' = Ker_x' * Ker_x - Hence either one works
  beta_m  = M_m \ b_m;
  
-        
- for i = 1: 1 : N
-     K(i)     = 0;
-     for k = 1 : 1 : N_ker
-         K(i)      = K(i)     + beta_m(k)  * Ker_x(i,k);      % Ker_x(pj,pi)
-     end
- end
+K = zeros(1,N);
+for k = 1 : 1 : N_ker
+    K      = K   + beta_m(k)  * Ker_x(:,k)';      % Ker_x(pj,pi)
+end
 
- toc
+toc
  
 %% For displaying figures
 if diag == 1
