@@ -1,7 +1,7 @@
 function [Phi K] = gain_coif(Xi, c, epsilon, Phi,N_ker, diag)
 % Returns the gain computed at particle locations Xi using the Coifman
 % kernel based method.
-
+tic
 N = length(Xi);
 T = zeros(N_ker);
 max_diff = 1;
@@ -36,8 +36,9 @@ while (max_diff > 1e-3 && iterations < No_iterations)                           
 end
 
 K = zeros(1,N);
+sum_term = T * Xi(1:N_ker)';
 for j = 1:1:N_ker
-        K  = K + (1/(2 * epsilon)) * (T(:,j) * Phi(j,end))' .* (Xi(j) * ones(1,N) - sum_term);  % Gain computed for particle index pi
+        K  = K + (1/(2 * epsilon)) * (T(:,j) * Phi(j,end))' .* (Xi(j) * ones(1,N) - sum_term');  % Gain computed for particle index pi
 end
 toc
 
