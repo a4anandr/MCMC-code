@@ -25,7 +25,7 @@ lambda  = 1e-7;   % 1e-6 or small value is optimal
 epsilon = 2;  % So far 1.5 - 2 is the best
 tic
 v = version('-release');
-while(check > 25)
+while(check > 21)
     train_i     = randsample(n, train_n);    
     theta_train = theta(train_i,:);
     if v == '2018a'

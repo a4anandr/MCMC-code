@@ -102,23 +102,23 @@ if No_trials > 1
         legend('show');
         title(['Histogram of the regression coefficient estimate \Theta_',num2str(i)]);
     
-        For_box_5 = [aver_asy_var_K(1:990,i) aver_var_Q(1:990,i) aver_asy_var_Q(1:990,i) aver_var_L(1:990,i) aver_asy_var_L(1:990,i) aver_no_cv(1:990,i)  ];
+        For_box_5 = [aver_asy_var_K(1:length(aver_asy_var_K),i) aver_var_Q(1:length(aver_asy_var_K),i) aver_asy_var_Q(1:length(aver_asy_var_K),i) aver_var_L(1:length(aver_asy_var_K),i) aver_asy_var_L(1:length(aver_asy_var_K),i) aver_no_cv(1:length(aver_asy_var_K),i)  ];
         % For_box = [aver_asy_var_K_sorted(1:948,i) aver_var_Q(1:948,i) aver_asy_var_Q(1:948,i) aver_var_L(1:948,i) aver_asy_var_L(1:948,i)];
         colors = [1 0 0; 0 1 0; 0 0 1; 0.5 0.5 0; 0.5 0 0.5; 0 0.5 0.5];
         figure;
         boxplot(For_box_5,'colors',colors);
         hLegend = legend(findall(gca,'Tag','Box'), {'Standard MC','Diff TD - linear','ZV - linear','Diff TD - quadratic', 'ZV - quadratic','Diff TD - RKHS'});
         
-        For_box_4 = [aver_asy_var_K(1:990,i) aver_var_Q(1:990,i) aver_asy_var_Q(1:990,i) aver_var_L(1:990,i) aver_asy_var_L(1:990,i)];
+        For_box_4 = [aver_asy_var_K(1:length(aver_asy_var_K),i) aver_var_Q(1:length(aver_asy_var_K),i) aver_asy_var_Q(1:length(aver_asy_var_K),i) aver_var_L(1:length(aver_asy_var_K),i) aver_asy_var_L(1:length(aver_asy_var_K),i)];
         colors = [1 0 0; 0 1 0; 0 0 1; 0.5 0.5 0; 0.5 0 0.5; 0 0.5 0.5];
         figure;
         boxplot(For_box_4,'colors',colors);
         hLegend = legend(findall(gca,'Tag','Box'), {'Diff TD - linear','ZV - linear','Diff TD - quadratic', 'ZV - quadratic','Diff TD - RKHS'});
         
-        For_box_var = [var_asy_var_K(1:987,i) var_var_Q(1:987,i) var_asy_var_Q(1:987,i) var_var_L(1:987,i) var_asy_var_L(1:987,i)];
+        For_box_var = [var_asy_var_K(1:length(var_asy_var_K),i) var_var_Q(1:length(var_asy_var_K),i) var_asy_var_Q(1:length(var_asy_var_K),i) var_var_L(1:length(var_asy_var_K),i) var_asy_var_L(1:length(var_asy_var_K),i)];
         colors = [1 0 0; 0 1 0; 0 0 1; 0.5 0.5 0; 0.5 0 0.5; 0 0.5 0.5];
         figure;
-        boxplot(For_box_4,'colors',colors);
+        boxplot(For_box_var,'colors',colors);
         hLegend = legend(findall(gca,'Tag','Box'), {'Diff TD - linear','ZV - linear','Diff TD - quadratic', 'ZV - quadratic','Diff TD - RKHS'});
     end
 end

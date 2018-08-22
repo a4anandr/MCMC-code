@@ -19,7 +19,7 @@ syms x;
 diag_main = 1;   % Diagnostics flag for main function, displays figures in main.
 diag_output = 1;
 diag_fn = 0;     % Diagnostics flag, if 1, then all the functions display plots for diagnostics, Set it to 0 to avoid plots from within the calling functions
-No_runs = 1;    % Total number of runs to compute the rmse metric for each of the filters for comparison
+No_runs = 10000;    % Total number of runs to compute the rmse metric for each of the filters for comparison
 
 %% Parameters of the target density - 2 component Gaussian mixture density 
 m = 2;
@@ -50,19 +50,19 @@ eta = sum(eta(range));
 
 %% Flags to be set to choose the MCMC sampling method 
 iid        = 0;
-langevin   = 0;
-metropolis = 1;
+langevin   = 1;
+metropolis = 0;
 % mala     = 1;
 
 % Sampling parameters
-N  = 10000;            % No of samples obtained
-gamma = 0.1;          % Time steps / variance parameter for Langevin and MH algorithms
-sgamma = sqrt(gamma); % Std deviation parameter
+N  = 100000;            % No of samples obtained
+gamma = 0.1;           % Time steps / variance parameter for Langevin and MH algorithms
+sgamma = sqrt(gamma);  % Std deviation parameter
     
 %% Flags to be set to choose which approximation methods to compare
 exact = 1;       % Computes the exact h' and plots 
 fin   = 0;       % Computes h' using finite dimensional basis
-coif  = 0;       % Computes h' using Coifman kernel method
+coif  = 1;       % Computes h' using Coifman kernel method
 rkhs  = 1;       % Computes h' using RKHS
 zero_mean = 1;   % Computes h' using RKHS with Lagrange multipliers
 const = 1;       % Computes the constant gain approximation
