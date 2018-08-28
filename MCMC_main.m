@@ -19,7 +19,7 @@ syms x;
 diag_main = 1;   % Diagnostics flag for main function, displays figures in main.
 diag_output = 1;
 diag_fn = 0;     % Diagnostics flag, if 1, then all the functions display plots for diagnostics, Set it to 0 to avoid plots from within the calling functions
-No_runs = 10000;    % Total number of runs to compute the rmse metric for each of the filters for comparison
+No_runs = 1000;    % Total number of runs to compute the rmse metric for each of the filters for comparison
 
 %% Parameters of the target density - 2 component Gaussian mixture density 
 m = 2;
@@ -50,8 +50,8 @@ eta = sum(eta(range));
 
 %% Flags to be set to choose the MCMC sampling method 
 iid        = 0;
-langevin   = 1;
-metropolis = 0;
+langevin   = 0;
+metropolis = 1;
 % mala     = 1;
 
 % Sampling parameters
@@ -60,14 +60,14 @@ gamma = 0.1;           % Time steps / variance parameter for Langevin and MH alg
 sgamma = sqrt(gamma);  % Std deviation parameter
     
 %% Flags to be set to choose which approximation methods to compare
-exact = 1;       % Computes the exact h' and plots 
+exact = 0;       % Computes the exact h' and plots 
 fin   = 0;       % Computes h' using finite dimensional basis
-coif  = 1;       % Computes h' using Coifman kernel method
-rkhs  = 1;       % Computes h' using RKHS
+coif  = 0;       % Computes h' using Coifman kernel method
+rkhs  = 0;       % Computes h' using RKHS
 zero_mean = 1;   % Computes h' using RKHS with Lagrange multipliers
-const = 1;       % Computes the constant gain approximation
+const = 0;       % Computes the constant gain approximation
 % Flag for variance minimization - ZV-MCMC based on Mira et al. 
-var_min = 1; 
+var_min = 0; 
 
 % i) Finite dimensional basis
 if fin == 1
@@ -85,16 +85,16 @@ end
 % iii) RKHS
 if rkhs == 1
    kernel   = 0;           % 0 for Gaussian kernel
-   lambda   = 1e-3;        % 0.05, 0.02, Regularization parameter - Other tried values ( 0.005,0.001,0.05), For kernel = 0, range 0.005 - 0.01.
-   eps_rkhs = 0.25;        % Variance parameter of the kernel  - Other tried values (0.25,0.1), For kernel = 0, range 0.1 - 0.25.
+   lambda_rkhs = 1e-3;     % 0.05, 0.02, Regularization parameter - Other tried values ( 0.005,0.001,0.05), For kernel = 0, range 0.005 - 0.01.
+   eps_rkhs = 0.1;         % Variance parameter of the kernel  - Other tried values (0.25,0.1), For kernel = 0, range 0.1 - 0.25.
    N_rkhs   = 500;         % Number of particles/samples where the RKHS kernel functions are computed at.
 end
 
 % iv) RKHS - zero mean
 if zero_mean == 1
    kernel   = 0;           % 0 for Gaussian kernel
-   lambda   = 1e-3;        % 0.05, 0.02, Regularization parameter - Other tried values ( 0.005,0.001,0.05), For kernel = 0, range 0.005 - 0.01.
-   eps_zm   = 0.25;        % Variance parameter of the kernel  - Other tried values (0.25,0.1), For kernel = 0, range 0.1 - 0.25.
+   lambda_zm  = 1e-3;     % 0.05, 0.02, Regularization parameter - Other tried values ( 0.005,0.001,0.05), For kernel = 0, range 0.005 - 0.01.
+   eps_zm   = 0.1;         % Variance parameter of the kernel  - Other tried values (0.25,0.1), For kernel = 0, range 0.1 - 0.25.
    N_zm     = 500;         % Number of particles/samples where the RKHS kernel functions are computed at.
 end
 
@@ -221,19 +221,19 @@ for run = 1: 1 : No_runs
 % iii) RKHS based approximation 
     if rkhs == 1
         if iid == 1
-           [~, K_rkhs_i] = gain_rkhs_mcmc(X_iid, c, kernel, lambda, eps_rkhs, N_rkhs, diag_fn );    
+           [~, K_rkhs_i] = gain_rkhs_mcmc(X_iid, c, kernel, lambda_rkhs, eps_rkhs, N_rkhs, diag_fn );    
            [cv_X_iid]    = compute_cv(X_iid, K_rkhs_i, grad_U_x);
            c_rkhs_iid    = c(X_iid) + cv_X_iid;
            c_hat_rkhs_iid(run) = mean(c_rkhs_iid);
         end
         if langevin == 1
-           [~, K_rkhs_l] = gain_rkhs_mcmc(X_lang , c, kernel,lambda, eps_rkhs, N_rkhs, diag_fn);
+           [~, K_rkhs_l] = gain_rkhs_mcmc(X_lang , c, kernel,lambda_rkhs, eps_rkhs, N_rkhs, diag_fn);
            [cv_X_lang]   = compute_cv(X_lang, K_rkhs_l, grad_U_x);
            c_rkhs_lang   = c(X_lang) + cv_X_lang;
            c_hat_rkhs_lang(run) = mean(c_rkhs_lang);
         end
         if metropolis == 1
-           [~, K_rkhs_m] = gain_rkhs_mcmc(X_mh , c, kernel,lambda, eps_rkhs, N_rkhs, diag_fn);
+           [~, K_rkhs_m] = gain_rkhs_mcmc(X_mh , c, kernel,lambda_rkhs, eps_rkhs, N_rkhs, diag_fn);
            [cv_X_mh]     = compute_cv(X_mh, K_rkhs_m, grad_U_x);
            c_rkhs_mh     = c(X_mh) + cv_X_mh;
            c_hat_rkhs_mh(run) = mean(c_rkhs_mh);
@@ -243,19 +243,19 @@ for run = 1: 1 : No_runs
 %    iv) RKHS - Zero mean 
     if zero_mean == 1
         if iid == 1
-           [~, K_zm_i]   = gain_rkhs_zm_mcmc(X_iid', c, 1, kernel, lambda, eps_zm, N_zm, diag_fn );    
+           [~, K_zm_i]   = gain_rkhs_zm_mcmc(X_iid', c, 1, kernel, lambda_zm, eps_zm, N_zm, diag_fn );    
            [cv_X_iid]    = compute_cv(X_iid, K_zm_i', grad_U_x);
            c_zm_iid      = c(X_iid) + cv_X_iid;
            c_hat_zm_iid(run) = mean(c_zm_iid);
         end
         if langevin == 1
-           [~, K_zm_l]   = gain_rkhs_zm_mcmc(X_lang' , c, 1, kernel,lambda, eps_zm, N_zm, diag_fn);
+           [~, K_zm_l]   = gain_rkhs_zm_mcmc(X_lang' , c, 1, kernel,lambda_zm, eps_zm, N_zm, diag_fn);
            [cv_X_lang]   = compute_cv(X_lang, K_zm_l', grad_U_x);
            c_zm_lang     = c(X_lang) + cv_X_lang;
            c_hat_zm_lang(run) = mean(c_zm_lang);
         end
         if metropolis == 1
-           [~, K_zm_m]   = gain_rkhs_zm_mcmc(X_mh' , c, 1, kernel,lambda, eps_zm, N_zm, diag_fn);
+           [~, K_zm_m]   = gain_rkhs_zm_mcmc(X_mh' , c, 1, kernel,lambda_zm, eps_zm, N_zm, diag_fn);
            [cv_X_mh]     = compute_cv(X_mh, K_zm_m', grad_U_x);
            c_zm_mh       = c(X_mh) + cv_X_mh;
            c_hat_zm_mh(run) = mean(c_zm_mh);
@@ -272,7 +272,7 @@ for run = 1: 1 : No_runs
         end
         if langevin == 1
             [K_var_fin_l] = var_min_fin(X_lang, c, d, basis, mu, sigma, p_wt, grad_U, diag_fn);
-            [cv_X_iid]    = compute_cv(X_lang, K_var_fin_l, grad_U_x);
+            [cv_X_lang]    = compute_cv(X_lang, K_var_fin_l, grad_U_x);
             c_fin_lang    = c(X_lang) + cv_X_lang;
             c_var_hat_fin_lang(run) = mean(c_fin_lang);
         end
